@@ -8,11 +8,15 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 // import CheckBox from 'react-native-check-box';
 import { useNavigation } from '@react-navigation/native';
+import { selectCalculator, selectCalculatorError, selectUserInfo } from './calculatorSlice';
+import { useSelector, useDispatch } from 'react-redux';
+
 
 const App = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [image, setImage] = useState(null);
   const navigation = useNavigation();    
+  const userInfo = useSelector(selectUserInfo);
   const handleCheckBox = () => {
           setIsChecked(!isChecked);
   };
@@ -122,12 +126,12 @@ const App = () => {
             <View className="flex-row mt-[40px]">
         <View className=" ml-[60px] flex items-center justify-center h-[80px] w-[80px] bg-white rounded-[100px]">
         <FontAwesome name="user-o" size={24} color="black" /></View>
-        <Text className="text-2xl mt-5 ml-11">Name</Text>
+        <Text className="text-2xl mt-5 ml-11">{userInfo?userInfo.userName:"Name"}</Text>
        
         </View>
         <View className="flex items-center justify-center">
-        <Text className="text-2xl my-10">Mobile Number</Text>
-        <Text className="text-2xl my-8 ">Email-id</Text>
+        <Text className="text-2xl my-10">{userInfo?userInfo.mobileNumber:"Mobile Number"}</Text>
+        {/* <Text className="text-2xl my-8 ">Email-id</Text> */}
         </View>
    </ScrollView>
       </KeyboardAvoidingView>

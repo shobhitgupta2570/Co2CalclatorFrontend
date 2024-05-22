@@ -9,19 +9,13 @@ import * as ImagePicker from 'expo-image-picker';
 // import CheckBox from 'react-native-check-box';
 import { useNavigation } from '@react-navigation/native';
 import * as yup from 'yup'
-import { useSelector, useDispatch } from 'react-redux';
-import { signupAsync } from './calculatorSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginAsync } from './calculatorSlice';
 
 const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 const signUpSchema = yup.object().shape({
   
-  userName: yup
-    .string()
-    .matches(/(\w.+\s).+/, 'Enter at least 2 names')
-    .required('User name is required'),
-  image: yup
-    .string()
-    .required('image is required'),
+  
   mobileNumber:yup
   .string()
   .matches(phoneRegex, 'Enter a valid phone number')
@@ -30,10 +24,7 @@ const signUpSchema = yup.object().shape({
     .string()
     .matches(phoneRegex, 'Enter a valid pin number')
     .required('Pin is required'),
-    confirmPin: yup
-    .string()
-    .oneOf([yup.ref('pin')], 'Pin do not match')
-    .required('Confirm pin is required'),
+   
   // email: yup
   //   .string()
   //   .email("Please enter valid email")
@@ -55,29 +46,13 @@ const signUpSchema = yup.object().shape({
 const App = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [image, setImage] = useState(null);
-  const navigation = useNavigation();   
-  const dispatch = useDispatch();  
-  const userInfo = useSelector(selectUserInfo);
+  const navigation = useNavigation();    
   const handleCheckBox = () => {
           setIsChecked(!isChecked);
   };
-  
-  const pickImage = async(setFieldValue) => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    // console.log(result);
-    // console.log(result.assets[0].uri);
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setFieldValue('image', result.assets[0].uri);
-    }
-  };
+  const dispatch = useDispatch();
+  const userInfo = useSelector(selectUserInfo);
+ 
 
   const handleSubmit = async (values) => {
     const formData = new FormData();
@@ -89,19 +64,19 @@ const App = () => {
 
     // Append other form fields to formData if necessary
     for (const key in values) {
-      if (key !== 'image') {
+      
         if (key === 'pin' || key === 'mobileNumber') {
           // Convert pin to a number
           formData.append(key, Number(values[key]));
         } else {
           formData.append(key, values[key]);
         }
-      }
+      
     }
     if (isChecked) {
         console.log(values);
-        console.log(formData);
-        dispatch(signupAsync(formData));
+        // console.log(formData);
+        dispatch(loginAsync(values));
         // Navigate to the next page
         if(userInfo){
         navigation.navigate('Calculator');}
@@ -172,32 +147,25 @@ const App = () => {
       <KeyboardAvoidingView className=" h-[70%] w-[100%] mt-8">
         <ScrollView>
       <Formik
-     initialValues={{ userName: '' , mobileNumber: null, pin: null ,confirmPin: null,  profileImage: null, isOtpVerified: false }}
+     initialValues={{ mobileNumber: null, pin: null  }}
      validationSchema={signUpSchema}
-     onSubmit={handleSubmit}
+     onSubmit={(values)=>{
+        if(isChecked) {
+            console.log(values);
+
+            // api for Login
+            
+            // Navigate to the next page
+            navigation.navigate('Calculator');
+     }else{
+
+    }
+    }}
    >
      {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, isValid,touched  }) => (
        <View className="pb-[50px]">
-         <Text className="text-3xl ml-[140px] font-semibold mb-11">Sign Up</Text>
-        {/* Photo Input */}
+         <Text className="text-3xl ml-[140px] font-semibold mb-11">Login</Text>
     
-      <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingBottom: 20}}>
-      {values.image && <Image source={{ uri: values.image }} className="h-[80px] w-[80px] rounded-[100px]" />}
-      <Button title="add photo" onPress={()=>pickImage(setFieldValue)} />
-      </View>
-      {(errors.image && touched.image) &&
-                  <Text style={{ color: 'red' }}>{errors.image}</Text>
-                }
-       
-         <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[90px]"
-           onChangeText={handleChange('userName')}
-           onBlur={handleBlur('userName')}
-           value={values.userName}
-           placeholder='User Name'
-         />
-         {(errors.userName && touched.userName) &&
-                  <Text style={{ color: 'red' }}>{errors.userName}</Text>
-                }
          <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[90px]"
            onChangeText={handleChange('mobileNumber')}
            onBlur={handleBlur('mobileNumber')}
@@ -206,9 +174,8 @@ const App = () => {
            keyboardType="numeric"
          />
           {(errors.mobileNumber && touched.mobileNumber) &&
-                  <Text style={{ color: 'red' }}>{errors.mobileNumber}</Text>
+                  <Text className="mx-auto" style={{ color: 'red' }}>{errors.mobileNumber}</Text>
                 }
-         <TouchableOpacity className="mx-[50px] px-[50px] bg-white"><Text className="text-blue-800">Verify Number By Otp</Text></TouchableOpacity>
         
            <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[90px]"
            onChangeText={handleChange('pin')}
@@ -218,19 +185,10 @@ const App = () => {
            keyboardType="numeric"
          />
          {(errors.pin && touched.pin) &&
-                  <Text style={{ color: 'red' }}>{errors.pin}</Text>
+                  <Text className="mx-auto" style={{ color: 'red' }}>{errors.pin}</Text>
                 } 
 
-<TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[90px]"
-           onChangeText={handleChange('confirmPin')}
-           onBlur={handleBlur('confirmPin')}
-           value={values.confirmPin}
-           placeholder='Confirm Pin'
-           keyboardType="numeric"
-         />
-         {(errors.confirmPin && touched.confirmPin) &&
-                  <Text style={{ color: 'red' }}>{errors.confirmPin}</Text>
-                }         
+      
           
         <View className="mx-[65px]  flex-row">
          <CheckBox

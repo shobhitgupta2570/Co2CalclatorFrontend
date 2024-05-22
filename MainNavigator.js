@@ -14,8 +14,9 @@ import Dashboard1 from './screens/Dashboard1';
 import Trips from './screens/Trips';
 import Settings from './screens/Settings';
 import Legal from './screens/Legal';
-import Login from './features/auth/components/Login';
+// import Login from './features/auth/components/Login';
 import Calculator from './features/calculator/Calculator';
+import Login from './features/calculator/Login';
 import Result from './features/calculator/Result';
 import Signup from './features/calculator/Signup';
 import Profile from './features/calculator/Profile';
@@ -90,7 +91,7 @@ export default () => {
       {/* {splash1Visible && <Splash1 />}
       {splash2Visible && <Splash2 />}
       {!splash1Visible && !splash2Visible && ( */}
-   <Stack.Navigator initialRouteName='Calculator' screenOptions={{ headerShown: false }}>
+   <Stack.Navigator initialRouteName='Login' screenOptions={{ headerShown: false }}>
    <Stack.Screen name="Landing" component={Landing} />
    <Stack.Screen name="Calculator" component={Calculator} />
    <Stack.Screen name="Result" component={Result} />

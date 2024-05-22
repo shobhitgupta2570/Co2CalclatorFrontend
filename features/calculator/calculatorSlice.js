@@ -1,10 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { calculateResult, fetchCount } from './calculatorApi';
+import { calculateResult, fetchCount, signup } from './calculatorApi';
 
 const initialState = {
   value: 0,
   status: 'idle',
-  result: null
+  result: null,
+  isAuthenticated: false,
+  userInfo: null,
 };
 
 export const incrementAsync = createAsyncThunk(
@@ -24,7 +26,35 @@ export const calculateResultAsync = createAsyncThunk(
     return response.data;
     }catch(error){
       console.log(error);
-      // return rejectWithValue(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const signupAsync = createAsyncThunk(
+  'calculator/signup',
+  async (signupInfo ) => {
+    try{
+      const response = await signup(signupInfo);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+    }catch(error){
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const loginAsync = createAsyncThunk(
+  'calculator/login',
+  async (loginInfo ) => {
+    try{
+      const response = await login(loginInfo);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+    }catch(error){
+      console.log(error);
+      return rejectWithValue(error);
     }
   }
 );
@@ -56,7 +86,30 @@ export const calculatorSlice = createSlice({
       .addCase(calculateResultAsync.rejected, (state, action) => {
         state.status = 'idle';
         state.error = action.payload;
-
+      })
+      .addCase(signupAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(signupAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.isAuthenticated = true;
+        state.userInfo = action.payload;
+      })
+      .addCase(signupAsync.rejected, (state, action) => {
+        state.status = 'idle';
+        state.error = action.payload;
+      })
+      .addCase(loginAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(loginAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.isAuthenticated = true;
+        state.userInfo = action.payload;
+      })
+      .addCase(loginAsync.rejected, (state, action) => {
+        state.status = 'idle';
+        state.error = action.payload;
       });
   },
 });
@@ -65,6 +118,8 @@ export const calculatorSlice = createSlice({
 
 export const selectCount = (state) => state.counter.value;
 export const selectCalculator = (state)=>state.calculator.result;
+export const selectIsAuthenticated = (state)=>state.calculator.isAuthenticated;
+export const selectUserInfo = (state)=>state.calculator.userInfo;
 export const selectCalculatorError = (state)=>state.calculator.error;
 
 export default calculatorSlice.reducer;
