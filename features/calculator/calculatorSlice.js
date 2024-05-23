@@ -159,7 +159,7 @@ export const calculatorSlice = createSlice({
       })
       .addCase(verifyOtpAsync.fulfilled, (state, action) => {
         state.status = 'idle';
-        state.isOtpVerified = action.payload.data;
+        state.isOtpVerified = action.payload.success;
         // console.log(action.payload);
       })
       .addCase(verifyOtpAsync.rejected, (state, action) => {
