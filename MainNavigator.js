@@ -88,9 +88,9 @@ export default () => {
 
    return (
       <>
-      {/* {splash1Visible && <Splash1 />}
+      {/* {splash1Visible && <Splash1 />} */}
       {splash2Visible && <Splash2 />}
-      {!splash1Visible && !splash2Visible && ( */}
+      {!splash1Visible && !splash2Visible && (
    <Stack.Navigator initialRouteName='Login' screenOptions={{ headerShown: false }}>
    <Stack.Screen name="Landing" component={Landing} />
    <Stack.Screen name="Calculator" component={Calculator} />
@@ -150,7 +150,7 @@ export default () => {
    <Stack.Screen name="VspAbout" component={VspAbout} /> */}
    {/* <Stack.Screen name="TrackDriver" component={TrackDriver} /> */}
 </Stack.Navigator>
-  {/* )}  */}
+   )}  
  </>
 );
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {ImageBackground, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View, Button, Image} from 'react-native';
+import {ImageBackground, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View, Button, Image, Modal} from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Formik, Form, Field } from 'formik';
 import { TextInput } from 'react-native';
@@ -10,7 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import * as yup from 'yup'
 import { useSelector, useDispatch } from 'react-redux';
-import { signupAsync } from './calculatorSlice';
+import { selectIsAuthenticated, selectIsOtpVerified, selectUserInfo, signupAsync, verifyOtpAsync } from './calculatorSlice';
 
 const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 const signUpSchema = yup.object().shape({
@@ -19,9 +19,9 @@ const signUpSchema = yup.object().shape({
     .string()
     .matches(/(\w.+\s).+/, 'Enter at least 2 names')
     .required('User name is required'),
-  image: yup
-    .string()
-    .required('image is required'),
+  // image: yup
+  //   .string()
+  //   .required('image is required'),
   mobileNumber:yup
   .string()
   .matches(phoneRegex, 'Enter a valid phone number')
@@ -54,10 +54,22 @@ const signUpSchema = yup.object().shape({
 
 const App = () => {
   const [isChecked, setIsChecked] = useState(false);
+  const [inputOtp, setInputOtp] = useState('');
   const [image, setImage] = useState(null);
   const navigation = useNavigation();   
   const dispatch = useDispatch();  
-  const userInfo = useSelector(selectUserInfo);
+  const userInfor = useSelector(selectUserInfo);
+  const isOtpVerified = useSelector(selectIsOtpVerified);
+  const isUserAuthenticated = useSelector(selectIsAuthenticated);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
   const handleCheckBox = () => {
           setIsChecked(!isChecked);
   };
@@ -79,47 +91,47 @@ const App = () => {
     }
   };
 
-  const handleSubmit = async (values) => {
-    const formData = new FormData();
-    formData.append('photo', {
-      uri: values.image.uri,
-      name: 'photo.jpg',
-      type: 'image/jpeg',
-    });
+  // const handleSubmit = async (values) => {
+  //   const formData = new FormData();
+  //   formData.append('photo', {
+  //     uri: values.image.uri,
+  //     name: 'photo.jpg',
+  //     type: 'image/jpeg',
+  //   });
 
-    // Append other form fields to formData if necessary
-    for (const key in values) {
-      if (key !== 'image') {
-        if (key === 'pin' || key === 'mobileNumber') {
-          // Convert pin to a number
-          formData.append(key, Number(values[key]));
-        } else {
-          formData.append(key, values[key]);
-        }
-      }
-    }
-    if (isChecked) {
-        console.log(values);
-        console.log(formData);
-        dispatch(signupAsync(formData));
-        // Navigate to the next page
-        if(userInfo){
-        navigation.navigate('Calculator');}
-      } else {
-        // Do nothing, stay on the same page
-      }
+  //   // Append other form fields to formData if necessary
+  //   for (const key in values) {
+  //     if (key !== 'image') {
+  //       if (key === 'pin' || key === 'mobileNumber') {
+  //         // Convert pin to a number
+  //         formData.append(key, Number(values[key]));
+  //       } else {
+  //         formData.append(key, values[key]);
+  //       }
+  //     }
+  //   }
+  //   if (isChecked) {
+  //       console.log(values);
+  //       console.log(formData);
+  //       dispatch(signupAsync(formData));
+  //       // Navigate to the next page
+  //       if(userInfo){
+  //       navigation.navigate('Calculator');}
+  //     } else {
+  //       // Do nothing, stay on the same page
+  //     }
 
-    // try {
-    //   const response = await axios.post('http://192.168.1.8:8000/api/v1/upload', formData, {
-    //     headers: {
-    //       'Content-Type': 'multipart/form-data',
-    //     },
-    //   });
-    //   console.log('Upload success', response.data);
-    // } catch (error) {
-    //   console.error('Upload error', error);
-    // }
-  };
+  //   // try {
+  //   //   const response = await axios.post('http://192.168.1.8:8000/api/v1/upload', formData, {
+  //   //     headers: {
+  //   //       'Content-Type': 'multipart/form-data',
+  //   //     },
+  //   //   });
+  //   //   console.log('Upload success', response.data);
+  //   // } catch (error) {
+  //   //   console.error('Upload error', error);
+  //   // }
+  // };
 
     //     const cities = [
     //       {name:"Los Angeles", id: 1},
@@ -159,7 +171,7 @@ const App = () => {
     <ImageBackground source={require("../../assets/images/image2.png")} resizeMode="cover" className="h-[100%] flex items-center">
       <View className="w-[105%] h-[13%] bg-[#ABE87A] rounded-b-[100px] flex-row">
         <Text className="mt-[40px] text-2xl ml-[100px]">Welcome, User</Text>
-        <TouchableOpacity className="mt-[40px] ml-[60px] flex items-center justify-center h-[40px] w-[40px] bg-white rounded-3xl" onPress={()=>navigation.navigate('Profile')}>
+        <TouchableOpacity className="mt-[40px] ml-[60px] flex items-center justify-center h-[40px] w-[40px] bg-white rounded-3xl" >
         <FontAwesome name="user-o" size={24} color="black" /></TouchableOpacity>
       </View>
 
@@ -172,22 +184,39 @@ const App = () => {
       <KeyboardAvoidingView className=" h-[70%] w-[100%] mt-8">
         <ScrollView>
       <Formik
-     initialValues={{ userName: '' , mobileNumber: null, pin: null ,confirmPin: null,  profileImage: null, isOtpVerified: false }}
+     initialValues={{ userName: '' , mobileNumber: null, pin: null ,confirmPin: null}}
      validationSchema={signUpSchema}
-     onSubmit={handleSubmit}
+     onSubmit={(values) => {
+      if (isChecked) {
+              console.log(values);
+              if(isOtpVerified){
+              dispatch(signupAsync(values));
+      }
+              // Navigate to the next page
+              // console.log("preSuccess")
+              
+              // if(isUserAuthenticated){
+              //   console.log("success")
+              navigation.navigate('Calculator');
+            // }
+            } else {
+              // Do nothing, stay on the same page
+            }
+     }
+    }
    >
      {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, isValid,touched  }) => (
        <View className="pb-[50px]">
          <Text className="text-3xl ml-[140px] font-semibold mb-11">Sign Up</Text>
         {/* Photo Input */}
     
-      <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingBottom: 20}}>
+      {/* <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingBottom: 20}}>
       {values.image && <Image source={{ uri: values.image }} className="h-[80px] w-[80px] rounded-[100px]" />}
       <Button title="add photo" onPress={()=>pickImage(setFieldValue)} />
       </View>
       {(errors.image && touched.image) &&
                   <Text style={{ color: 'red' }}>{errors.image}</Text>
-                }
+                } */}
        
          <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[90px]"
            onChangeText={handleChange('userName')}
@@ -208,7 +237,29 @@ const App = () => {
           {(errors.mobileNumber && touched.mobileNumber) &&
                   <Text style={{ color: 'red' }}>{errors.mobileNumber}</Text>
                 }
-         <TouchableOpacity className="mx-[50px] px-[50px] bg-white"><Text className="text-blue-800">Verify Number By Otp</Text></TouchableOpacity>
+         <TouchableOpacity onPress={openModal} className="mx-auto px-[20px] bg-white"><Text className="text-blue-800 font-bold">Send Otp</Text></TouchableOpacity>
+         <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View className="" style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <View className="h-[300px] flex-column" style={{ backgroundColor: '#fff', padding: 20, borderRadius: 10, width: '80%' }}>
+            <Text className="text-2xl ml-[0px]">Fill Otp</Text>
+            <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[40px]"
+           value={inputOtp}
+           onChangeText={setInputOtp}
+           placeholder='Enter Otp'
+         />
+           <View className="mt-11">
+            <Button  title="Verify Otp" onPress={()=>{setModalVisible(false); dispatch(verifyOtpAsync(inputOtp)); }} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+     
+         {/* <TouchableOpacity className="mx-auto mt-5 px-[20px] bg-white"><Text className="text-blue-800 font-bold">Verify Otp</Text></TouchableOpacity> */}
         
            <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[90px]"
            onChangeText={handleChange('pin')}
@@ -249,6 +300,9 @@ const App = () => {
        </View>
      )}
    </Formik>
+   <TouchableOpacity onPress={()=>navigation.navigate("Login")} className="flex-row mx-auto"><Text className="  text-xl font-[600]">Existing User ?</Text>
+   <Text className="  text-xl text-blue-700 font-[800]"> Login</Text>
+   </TouchableOpacity>
    </ScrollView>
       </KeyboardAvoidingView>
     </ImageBackground>

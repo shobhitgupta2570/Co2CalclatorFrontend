@@ -57,8 +57,8 @@ const App = () => {
     <ImageBackground source={require("../../assets/images/image2.png")} resizeMode="cover" className="h-[100%] flex items-center">
       <View className="w-[105%] h-[13%] bg-[#ABE87A] rounded-b-[100px] flex-row">
         <Text className="mt-[40px] text-2xl ml-[120px]">Hello, Name</Text>
-        <View className="mt-[40px] ml-[60px] flex items-center justify-center h-[40px] w-[40px] bg-white rounded-3xl">
-        <FontAwesome name="user-o" size={24} color="black" /></View>
+        <TouchableOpacity onPress={(()=>navigation.navigate("Profile"))} className="mt-[40px] ml-[60px] flex items-center justify-center h-[40px] w-[40px] bg-white rounded-3xl">
+        <FontAwesome name="user-o" size={24} color="black" /></TouchableOpacity>
       </View>
       <Text className="text-xl mt-2 px-6">Track your carbon footprint </Text>
       <Text className="text-xl px-6">effortlessly with our CO2 emission</Text>
@@ -86,13 +86,13 @@ const App = () => {
        <View className="pb-[50px]">
     
         <Text className="text-xl ml-10 mb-1">Trip Details</Text>
-         <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[90px]"
+         <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[70px]"
            onChangeText={handleChange('VechileNumber')}
            onBlur={handleBlur('VechileNumber')}
            value={values.VechileNumber}
            placeholder='Vechile Number'
          />
-           <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[90px]"
+           <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[70px]"
            onChangeText={handleChange('SourcePincode')}
            onBlur={handleBlur('SourcePincode')}
            value={values.SourcePincode}
@@ -106,7 +106,7 @@ const App = () => {
            placeholder='Destination Pincode'
            keyboardType="numeric"
          />
-           <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[90px]"
+           <TextInput className="mx-[12%] my-2 rounded-xl border-2 text-black-200 text-lg font-semibold pl-[70px]"
            onChangeText={handleChange('LoadedWeight')}
            onBlur={handleBlur('LoadedWeight')}
            value={values.LoadedWeight}

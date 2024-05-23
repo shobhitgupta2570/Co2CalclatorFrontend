@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { calculateResult, fetchCount, signup } from './calculatorApi';
+import { calculateResult, fetchCount, login, signup, verifyOtp } from './calculatorApi';
 
 const initialState = {
   value: 0,
@@ -7,6 +7,8 @@ const initialState = {
   result: null,
   isAuthenticated: false,
   userInfo: null,
+  isOtpVerified: false,
+  isNumberRecieved : false
 };
 
 export const incrementAsync = createAsyncThunk(
@@ -59,6 +61,34 @@ export const loginAsync = createAsyncThunk(
   }
 );
 
+export const verifyOtpAsync = createAsyncThunk(
+  'calculator/verifyOtp',
+  async (verifyOtpInfo ) => {
+    try{
+      const response = await verifyOtp(verifyOtpInfo);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+    }catch(error){
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const sendNumberAsync = createAsyncThunk(
+  'calculator/sendNumber',
+  async (sendNumberInfo ) => {
+    try{
+      const response = await sendNumber(sendNumberInfo);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+    }catch(error){
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const calculatorSlice = createSlice({
   name: 'counter',
   initialState,
@@ -93,7 +123,7 @@ export const calculatorSlice = createSlice({
       .addCase(signupAsync.fulfilled, (state, action) => {
         state.status = 'idle';
         state.isAuthenticated = true;
-        state.userInfo = action.payload;
+        state.userInfo = action.payload.data;
       })
       .addCase(signupAsync.rejected, (state, action) => {
         state.status = 'idle';
@@ -105,12 +135,38 @@ export const calculatorSlice = createSlice({
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.status = 'idle';
         state.isAuthenticated = true;
-        state.userInfo = action.payload;
+        state.userInfo = action.payload.data;
+        // console.log(action.payload);
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.status = 'idle';
         state.error = action.payload;
-      });
+      })
+      .addCase(sendNumberAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(sendNumberAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.isNumberRecieved = action.payload.data;
+        // console.log(action.payload);
+      })
+      .addCase(sendNumberAsync.rejected, (state, action) => {
+        state.status = 'idle';
+        state.error = action.payload;
+      })
+      .addCase(verifyOtpAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(verifyOtpAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.isOtpVerified = action.payload.data;
+        // console.log(action.payload);
+      })
+      .addCase(verifyOtpAsync.rejected, (state, action) => {
+        state.status = 'idle';
+        state.error = action.payload;
+      })
+      ;
   },
 });
 
@@ -119,6 +175,8 @@ export const calculatorSlice = createSlice({
 export const selectCount = (state) => state.counter.value;
 export const selectCalculator = (state)=>state.calculator.result;
 export const selectIsAuthenticated = (state)=>state.calculator.isAuthenticated;
+export const selectIsNumberRecieved = (state)=>state.calculator.isNumberRecieved;
+export const selectIsOtpVerified = (state)=>state.calculator.isOtpVerified;
 export const selectUserInfo = (state)=>state.calculator.userInfo;
 export const selectCalculatorError = (state)=>state.calculator.error;
 

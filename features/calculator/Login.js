@@ -10,7 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import * as yup from 'yup'
 import { useDispatch, useSelector } from 'react-redux';
-import { loginAsync } from './calculatorSlice';
+import { loginAsync, selectUserInfo } from './calculatorSlice';
 
 const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 const signUpSchema = yup.object().shape({
@@ -134,7 +134,7 @@ const App = () => {
     <ImageBackground source={require("../../assets/images/image2.png")} resizeMode="cover" className="h-[100%] flex items-center">
       <View className="w-[105%] h-[13%] bg-[#ABE87A] rounded-b-[100px] flex-row">
         <Text className="mt-[40px] text-2xl ml-[100px]">Welcome, User</Text>
-        <TouchableOpacity className="mt-[40px] ml-[60px] flex items-center justify-center h-[40px] w-[40px] bg-white rounded-3xl" onPress={()=>navigation.navigate('Profile')}>
+        <TouchableOpacity className="mt-[40px] ml-[60px] flex items-center justify-center h-[40px] w-[40px] bg-white rounded-3xl" >
         <FontAwesome name="user-o" size={24} color="black" /></TouchableOpacity>
       </View>
 
@@ -152,7 +152,7 @@ const App = () => {
      onSubmit={(values)=>{
         if(isChecked) {
             console.log(values);
-
+            dispatch(loginAsync(values));
             // api for Login
             
             // Navigate to the next page
@@ -207,6 +207,9 @@ const App = () => {
        </View>
      )}
    </Formik>
+   <TouchableOpacity onPress={()=>navigation.navigate("Signup")} className="flex-row mx-auto"><Text className="  text-xl font-[600]">New User ?</Text>
+   <Text className="  text-xl text-blue-700 font-[800]"> Signup</Text>
+   </TouchableOpacity>
    </ScrollView>
       </KeyboardAvoidingView>
     </ImageBackground>

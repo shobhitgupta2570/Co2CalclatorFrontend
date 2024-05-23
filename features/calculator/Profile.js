@@ -130,7 +130,7 @@ const App = () => {
        
         </View>
         <View className="flex items-center justify-center">
-        <Text className="text-2xl my-10">{userInfo?userInfo.mobileNumber:"Mobile Number"}</Text>
+        <Text className="text-2xl my-10">{userInfo?`No. :- ${userInfo.mobileNumber}`:"Mobile Number"}</Text>
         {/* <Text className="text-2xl my-8 ">Email-id</Text> */}
         </View>
    </ScrollView>
