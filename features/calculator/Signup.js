@@ -10,7 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import * as yup from 'yup'
 import { useSelector, useDispatch } from 'react-redux';
-import { selectIsAuthenticated, selectIsOtpVerified, selectUserInfo, signupAsync, verifyOtpAsync } from './calculatorSlice';
+import { selectIsAuthenticated, selectIsOtpVerified, selectUserInfo, sendNumberAsync, signupAsync, verifyOtpAsync } from './calculatorSlice';
 
 const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 const signUpSchema = yup.object().shape({
@@ -72,6 +72,18 @@ const App = () => {
   };
   const handleCheckBox = () => {
           setIsChecked(!isChecked);
+  };
+
+  const handleSendOtp = (mobileNumber) => {
+    if (mobileNumber) {
+      // Logic to send OTP
+      console.log({'mobileNumber': mobileNumber});
+      dispatch(sendNumberAsync({'mobileNumber': mobileNumber}))
+      // Open the OTP modal
+      setModalVisible(true);
+    } else {
+      console.log('Mobile number is required to send OTP');
+    }
   };
   
   const pickImage = async(setFieldValue) => {
@@ -237,7 +249,7 @@ const App = () => {
           {(errors.mobileNumber && touched.mobileNumber) &&
                   <Text style={{ color: 'red' }}>{errors.mobileNumber}</Text>
                 }
-         <TouchableOpacity onPress={openModal} className="mx-auto px-[20px] bg-white"><Text className="text-blue-800 font-bold">Send Otp</Text></TouchableOpacity>
+         <TouchableOpacity onPress={() => handleSendOtp(values.mobileNumber)} className="mx-auto px-[20px] bg-white"><Text className="text-blue-800 font-bold">Send Otp</Text></TouchableOpacity>
          <Modal
         animationType="slide"
         transparent={true}

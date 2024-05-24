@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { calculateResult, fetchCount, login, signup, verifyOtp } from './calculatorApi';
+import { calculateResult, fetchCount, login, sendNumber, signup, verifyOtp } from './calculatorApi';
 
 const initialState = {
   value: 0,
