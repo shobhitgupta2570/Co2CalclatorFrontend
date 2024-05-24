@@ -28,7 +28,9 @@ const signUpSchema = yup.object().shape({
   .required('Phone number is required'),
     pin: yup
     .string()
-    .matches(phoneRegex, 'Enter a valid pin number')
+    .min(4, 'Length should be 4')
+     .max(4, 'Length should be 4')
+    // .matches(phoneRegex, 'Enter a valid pin number')
     .required('Pin is required'),
     confirmPin: yup
     .string()
@@ -265,7 +267,7 @@ const App = () => {
            placeholder='Enter Otp'
          />
            <View className="mt-11">
-            <Button  title="Verify Otp" onPress={()=>{setModalVisible(false); dispatch(verifyOtpAsync(inputOtp)); }} />
+            <Button  title="Verify Otp" onPress={()=>{setModalVisible(false); dispatch(verifyOtpAsync({"otp":inputOtp, "mobileNumber":values.mobileNumber})); }} />
             </View>
           </View>
         </View>
